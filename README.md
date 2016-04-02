@@ -3,6 +3,13 @@
 GreenThumb is an extensible framework for constructing superoptimizers. It is designed to be easily extended to a new target ISA using inheritance. GreenThumb is implemented in Racket.
 The top level directory contains ISA-independent files, which implement the superclasses to be extended. We have built superoptimizers for ARM, GreenArrays GA144 (GA), and a small subset of LLVM IR. Directories `arm`, `GA`, and `llvm-demo` contain ISA-sepcific files for ARM, GA, and LLVM IR respectively.
 
+## References
+
+- [Video](https://youtu.be/3l7Z7kB5p3g) demonstrates how to build a LLVM IR superoptimizer using GreenThumb.
+- [Greenthumb: Superoptimizer Construction Framework (CC'16)](http://www.eecs.berkeley.edu/~mangpo/www/papers/greenthumb_cc2016.pdf) explains the framework overview.
+- [Greenthumb: Superoptimizer Construction Framework (Tech Report)](http://www.eecs.berkeley.edu/Pubs/TechRpts/2016/EECS-2016-8.pdf) explains the overview of how to extend the framework to support a new ISA.
+- [Scaling Up Superoptimization (ASPLOS'16)](http://www.eecs.berkeley.edu/~mangpo/www/papers/lens-asplos16.pdf) explains the search strategy provided by GreenThumb.
+
 ## Software Prerequisites
 - **Racket**: Download and install drracket from https://racket-lang.org/download/. Include the installed 'bin' directory, which contains racket, drracket, raco, and etc., to the environment path.
 - **Rosette**: Download and follow the instruction to install rosette from https://github.com/emina/rosette
@@ -73,12 +80,12 @@ stoch:	2 instances
 sym:	2 instances
 enum:	4 instances
 
-ID 0-1: stoch (optimize)         << driver-0 and 1 run stochastic search.
-ID 2-2: sym (window=L)         << driver-2 runs symbolic search.
+ID 0-1: stoch (optimize)          << driver-0 and 1 run stochastic search.
+ID 2-2: sym (window=L)            << driver-2 runs symbolic search.
 ID 3-3: sym (window=2L)           << driver-3 runs symbolic search.
-ID 4-4: enum (no-decomposition)  << driver-4 runs enumerative search (no window).
-ID 5-6: enum (window=L)        << driver-5 and 6 run enumerative search.
-ID 7-7: enum (window=2L)        << driver-7 run enumerative search.
+ID 4-4: enum (no-decomposition)   << driver-4 runs enumerative search (no window).
+ID 5-6: enum (window=L)           << driver-5 and 6 run enumerative search.
+ID 7-7: enum (window=2L)          << driver-7 run enumerative search.
 ```
 
 X in (window=X) indicates the size of window used in the context-aware window decomposition.
@@ -114,7 +121,7 @@ accept-higher-count: 0.000457  << rate of accepting mutated programs with higher
 cost:	3            << cost of the best program found so far
 len:	3            << length of the best program found so far
 time:	15           << time in seconds to find the best program
-output/0/driver-7  << the best program is found by driver-<id> (7 in this case).
+output/0/driver-7    << the best program is found by driver-7 (enumerative search in this example).
 ```
 
 Press Ctrl-C to end the process early or wait until time is up. At the end, the search driver will print out the optimized program. Below is the output program when optimizing p14_floor_avg_o0.s.
@@ -140,7 +147,8 @@ The script will generate `llvm` directory that contains
 - `test-search.rkt` program for testing the individual search techniques
 - `main.rkt` and `optimize.rkt` programs for running the complete cooperative search launching multiple search instances
 
-Now, we can start implementing our superoptimizer in the following order.
+Now, we can start implementing our superoptimizer in the following order. The more detailed explanations about the classes and methods that need to be extended can be found at http://www.eecs.berkeley.edu/Pubs/TechRpts/2016/EECS-2016-8.pdf.
+
 - **Step 1**: Extend `machine%`. Open `llvm/llvm-machine.rkt` and complete the implementation before the "for stochastic and enumerative" section.
 - **Step 2**: Extend `parser%` and `printer%`. Complete the implementation before the "for cooperative search" section. Use `test-simulator.rkt` to test the parser and the printer.
 - **Step 3**: Extend `simulator-rosette%`. Use `test-simulator.rkt` and uncomment the next test to run the ISA simulator in Rosette. Then, copy the required methods implemented for `simulator-rosette%` to `simulator-racket%`. Use `test-simulator.rkt` to run the ISA simulator in Racket.
@@ -161,4 +169,4 @@ raco make <list_of_flies_to_be_compiled>
 ```
 
 ## Inquery and Bug Report
-Please contact mangpo [at] eecs.berkeley.edu
+If you are interested in using GreenThumb, please feel free to contact mangpo [at] eecs.berkeley.edu. If there is enough interest, we can write a very detailed step-by-step tutorial!
